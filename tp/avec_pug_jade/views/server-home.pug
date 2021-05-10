@@ -1,7 +1,8 @@
-doctype html
-html(lang='en')
- head
-   title server-home
- body
+extends _base
+
+block title
+  title server-home (pug , jade)
+
+block content
    h1 Menu principal
    a(href='calcul') nouveau_calcul

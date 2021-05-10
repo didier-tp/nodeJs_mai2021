@@ -1,0 +1,18 @@
+<!-- ce fichier _base.pug sera utilisé par héritage  depuis d'autres fichier via "extends _base" -->
+<!-- un block a un nom logique (plus bas script ou title ou content) -->
+<!--            et un contenu par defaut -->
+<!--            et sa valeur pourra être redefinie/remplacee -->
+<!--            au sein d'un autre template heritant de _base -->
+doctype html
+html(lang='en')
+ head
+   link(rel='stylesheet' , href='css/styles.css')
+   block script
+     script(src='js/f1.js')
+   block title
+     title default_title
+ body
+   block content
+     p default_content
+   hr
+   a(href='server-home') vers server_home 

@@ -1,0 +1,18 @@
+doctype html
+html(lang='en')
+ head
+   title calcul
+ body
+    h3 calcul (paramétrages)
+    a(href='addition?a=5&b=6') 5+6
+    br
+    form(method='get',action='addition')
+      p 
+        label a:
+        input(name='a',value='2')
+      p
+        label b:
+        input(name='b',value='3')
+      p
+        input(type='submit',value='addition')
+

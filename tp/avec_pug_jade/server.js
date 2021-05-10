@@ -2,7 +2,8 @@ var express = require('express');
 
 var app = express();
 
-app.use('/css', express.static(__dirname+"/css"));
+app.use('/css', express.static(__dirname+"/css"));//css interprété coté navigateur
+app.use('/js', express.static(__dirname+"/js")); //script coté navigateur 
 
 app.set('view engine', 'pug'); //nécessite npm install -s pug
 
@@ -24,7 +25,9 @@ app.get('/addition', function(req , res ) {
     let va = Number(req.query.a);
     let vb = Number(req.query.b);
     let vaPlusVb = va+vb;
-    res.render('addResult', {a: va, b: vb, resAdd: vaPlusVb });
+    let listeCouleurs = [ 'rouge' , 'vert' , 'bleu']
+    res.render('addResult', {a: va, b: vb, resAdd: vaPlusVb ,
+                             couleurs : listeCouleurs });
     //rendering views/addResult.pug with js values 
     //for #{a} , #{b} , #{resAdd} in .pug
 });

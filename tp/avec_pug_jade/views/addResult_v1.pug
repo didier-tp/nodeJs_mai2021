@@ -1,9 +1,9 @@
-extends _base
-
-block title
-  title addResult
-
-block content
+doctype html
+html(lang='en')
+ head
+   title addResult
+   link(rel='stylesheet' , href='css/styles.css')
+ body
    h3 Resultat du calcul
    p 
      label a=
@@ -19,9 +19,6 @@ block content
      span le resultat est positif
    else 
      span le resultat est negatif
-   hr
-   button(onclick='montrerCacherDiv(\'divA\')') montrer ou cacher 
-   div(id='divA') divA est une diva !
    hr
    ul
      each c in couleurs

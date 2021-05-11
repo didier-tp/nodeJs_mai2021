@@ -32,14 +32,20 @@ app.get('/addition', function(req , res ) {
     //for #{a} , #{b} , #{resAdd} in .pug
 });
 
-//GET addition?a=5&b=6
+//GET calculTva?ht=200&taux=20
 app.get('/calculTva', function(req , res ) {
+    /*
     let vht = req.query.ht?Number(req.query.ht):0;
     let vtaux = req.query.taux?Number(req.query.taux):0; //en %
     let vtva = vht*vtaux/100;
-    let vttc = vht + vtaux;
+    let vttc = vht + vtva;
     res.render('calculTva', {ht: vht, taux: vtaux, tva: vtva ,
-                             ttc : vttc });
+                             ttc : vttc });*/
+    let ht = req.query.ht?Number(req.query.ht):0;
+    let taux = req.query.taux?Number(req.query.taux):0; //en %
+    let tva = ht*taux/100;
+    let ttc = ht + tva;
+    res.render('calculTva', {ht, taux, tva , ttc });                         
     //rendering views/calculTva.pug with js values 
     // #{tva} , #{ttc} in .pug
 });

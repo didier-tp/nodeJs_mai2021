@@ -1,0 +1,23 @@
+extends _base
+
+block title
+  title addResult
+
+block content
+  form(method='get',action='calculTva')
+    p 
+      label ht:
+      input(name='ht',value=ht)
+    p
+      label taux (en%):
+      input(name='taux',value=taux)
+    p
+      input(type='submit',value='calculer tva et ttc')
+  hr
+  p 
+     label tva=
+     span #{tva}
+  p 
+     label ttc =
+     span #{ttc}
+  

@@ -5,7 +5,7 @@ var app = express();
 app.use('/css', express.static(__dirname+"/css"));//css interprété coté navigateur
 app.use('/js', express.static(__dirname+"/js")); //script coté navigateur 
 
-app.set('view engine', 'pug'); //nécessite npm install -s pug
+app.set('view engine', 'pug'); //nécessite npm install -s pug 
 
 app.get('/', function(req , res ) {
   res.redirect('/server-home');
@@ -30,6 +30,18 @@ app.get('/addition', function(req , res ) {
                              couleurs : listeCouleurs });
     //rendering views/addResult.pug with js values 
     //for #{a} , #{b} , #{resAdd} in .pug
+});
+
+//GET addition?a=5&b=6
+app.get('/calculTva', function(req , res ) {
+    let vht = req.query.ht?Number(req.query.ht):0;
+    let vtaux = req.query.taux?Number(req.query.taux):0; //en %
+    let vtva = vht*vtaux/100;
+    let vttc = vht + vtaux;
+    res.render('calculTva', {ht: vht, taux: vtaux, tva: vtva ,
+                             ttc : vttc });
+    //rendering views/calculTva.pug with js values 
+    // #{tva} , #{ttc} in .pug
 });
 
 app.listen(8282 , function () {

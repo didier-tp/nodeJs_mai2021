@@ -1,10 +1,10 @@
 var ibmdb = require('ibm_db');
-var connStr = "DATABASE=<dbname>;HOSTNAME=<myhost>;UID=db2user;PWD=password;PORT=<dbport>;PROTOCOL=TCPIP";
+var connStr = "DATABASE=myDB;HOSTNAME=localhost;UID=db2admin;PWD=db2admin;PORT=50000;PROTOCOL=TCPIP";
 
 ibmdb.open(connStr, function (err,conn) {
   if (err) return console.log(err);
   
-  conn.query('select * from sysibm.sysdummy1', function (err, data) {
+  conn.query('select * from Devise', function (err, data) {
     if (err) console.log(err);
     else console.log(data);
 

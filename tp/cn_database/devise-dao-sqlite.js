@@ -7,28 +7,31 @@ function withDbConnection(callbackWithDb){
 }
 
 function init_devise_db(){
-withDbConnection(function(db) {
-    db.serialize(function() {
+withDbConnection(  function (db) {
+  db.serialize(function() {
 
-      // Devise_ID INTEGER PRIMARY KEY  not used here (no autoincr)
+    // Devise_ID INTEGER PRIMARY KEY  not used here (no autoincr)
 
-      db.run("CREATE TABLE if not exists devise (code VARCHAR(12) PRIMARY KEY, nom VARCHAR(64) NOT NULL , change DOUBLE)");
-      
-      db.run("DELETE FROM devise");
-      
-      var pst = db.prepare("INSERT INTO DEVISE(code,nom,change) VALUES (?,?,?)");
-      pst.run(["EUR" , "Euro" , 1.0]);
-      pst.run(["USD" , "Dollar" , 1.1]);
-      pst.run(["GBP" , "Livre" , 0.9]);
-      pst.run(["JPY" , "Yen" , 123.0]);
-      pst.finalize();
+    db.run("CREATE TABLE if not exists devise (code VARCHAR(12) PRIMARY KEY, nom VARCHAR(64) NOT NULL , change DOUBLE)");
+    
+    db.run("DELETE FROM devise");
+    
+    var pst = db.prepare("INSERT INTO DEVISE(code,nom,change) VALUES (?,?,?)");
+    pst.run(["EUR" , "Euro" , 1.0]);
+    pst.run(["USD" , "Dollar" , 1.1]);
+    pst.run(["GBP" , "Livre" , 0.9]);
+    pst.run(["JPY" , "Yen" , 123.0]);
+    pst.finalize();
 
-      db.each("SELECT code,nom,change FROM devise", function(err, row) {
-          console.log(JSON.stringify(row));
-      });
+    db.each("SELECT code,nom,change FROM devise", function(err, row) {
+        console.log(JSON.stringify(row));
     });
-  }); //end of withDbConnection()
+  });
 }
+); //end of withDbConnection()
+}
+
+
 
 function insert_new_devise(devise , cb_with_err_and_lastId){
   withDbConnection(function(db) {

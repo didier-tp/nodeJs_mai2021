@@ -1,2 +1,4 @@
 h1,h3 { color : red;}
 p { color : blue;}
+.enEvidence { font-weight: bold; font-style : italic; }
+.unPeuPlusGrand { font-size: 130%;}

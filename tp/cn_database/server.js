@@ -3,14 +3,15 @@ var express = require('express');
 //var deviseApiRoutes = require('./devise-api-routes_v2_avec_mongo');
 var deviseApiRoutes = require('./devise-api-routes_v3_avec_sqlite');
 //var deviseApiRoutes = require('./devise-api-routes_v4_avec_mongoose');
-//var produitApiRoutes = require('./produit-api-routes_memory');
-var produitApiRoutes = require('./produit-api-routes_sqlite');
+var produitApiRoutes = require('./produit-api-routes_memory');
+//var produitApiRoutes = require('./produit-api-routes_sqlite');
 //var produitApiRoutes = require('./produit-api-routes_mongoose');
-var bodyParser = require('body-parser');
+//var bodyParser = require('body-parser');
 var app = express();
 
 //support parsing of JSON post data
-var jsonParser = bodyParser.json() ;
+//var jsonParser = bodyParser.json()  pour premières version 4.x de express
+var jsonParser = express.json() ; //pour versions très récente de express
 app.use(jsonParser);
 
 // CORS enabled with express/node-js :
@@ -35,7 +36,7 @@ app.use(function(req, res, next) {
 app.use('/html', express.static(__dirname+"/html"));
 app.get('/', function(req , res ) {
   res.redirect('/html/index.html');
-});
+}); 
 
 app.use(deviseApiRoutes.apiRouter);// delegate REST API routes
 app.use(produitApiRoutes.apiRouter);// to apiRouter(s)

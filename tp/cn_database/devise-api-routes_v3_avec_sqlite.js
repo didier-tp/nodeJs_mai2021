@@ -6,32 +6,65 @@ var devise_dao_sqlite = require('./devise-dao-sqlite');
 
 //exemple URL: http://localhost:8282/devise-api/public/devise/EUR
 apiRouter.route('/devise-api/public/devise/:code')
-.get( function(req , res  , next ) {
-	var codeDevise = req.params.code;
-	devise_dao_sqlite.get_devise_by_code( codeDevise ,
-									    function(err,devise){
-											if(devise==null)
-											   res.status(404).send({ err : 'not found'});
-											else
-										       res.send(devise);
-									   });
-	
+.get( async function(req , res  , next ) {
+	try { 
+		var codeDevise = req.params.code;
+		let devise = await devise_dao_sqlite.get_devise_by_code( codeDevise );
+		res.send(devise);
+	}catch(err){
+		res.status(404).send({ err : 'not found'});
+	}					
 });
+
+//exemple URL: http://localhost:8282/devise-api/public/conversion?montant=100&source=EUR&cible=USD
+apiRouter.route('/devise-api/public/conversion')
+.get( async function(req , res  , next ) {
+	try{
+		var montant = Number(req.query.montant);
+		var source = req.query.source;
+		var cible = req.query.cible;
+		let deviseSource = await devise_dao_sqlite.get_devise_by_code(source);
+		let deviseCible = await devise_dao_sqlite.get_devise_by_code(cible);
+		let montantConverti = montant * deviseCible.change / deviseSource.change;
+		res.send({ montant , source , cible , montantConverti});
+	}catch(err){
+		console.log(JSON.stringify(err));
+		res.status(500).send({ erreur : 'echec conversion'})
+	}
+});
+
 
 //exemple URL: http://localhost:8282/devise-api/public/devise (returning all devises)
 //             http://localhost:8282/devise-api/public/devise?changeMini=1.05
 apiRouter.route('/devise-api/public/devise')
-.get( function(req , res  , next ) {
+.get( async function(req , res  , next ) {
 	var changeMini = Number(req.query.changeMini);
 	var whereClause=changeMini?"WHERE change >= "+changeMini : "";
 	//console.log("whereClause="+whereClause);
+	/*
 	devise_dao_sqlite.get_devises_by_WhereClause(whereClause,function(err,devises){
 		   if(err) {
 			   console.log("err="+err);
 	       }
 		   res.send(devises);
 	});//end of get_devises_by_WhereClause()
+	*/
+
+	/*
+	devise_dao_sqlite.get_devises_by_WhereClause(whereClause)
+	.then((devises)=>{ res.send(devises);})
+	.catch((err)=>{console.log(err) })
+	*/
+    try {
+	   //Rappel : await ne peut être utilisé que depuis une fonction préfixée par async
+	   let devises = await devise_dao_sqlite.get_devises_by_WhereClause(whereClause);
+	   res.send(devises);
+	}catch(err){
+		console.log(err);
+	}
+
 });
+
 
 // http://localhost:8282/devise-api/private/role-admin/devise en mode post
 // avec { "code" : "mxy" , "nom" : "monnaieXy" , "change" : 123 } dans req.body

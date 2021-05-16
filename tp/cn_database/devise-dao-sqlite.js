@@ -1,5 +1,7 @@
 var sqlite3 = require('sqlite3').verbose();
 
+var NotFoundError = require('./errorWithStatus').NotFoundError;
+
 function withDbConnection(callbackWithDb) {
   var db = new sqlite3.Database('mydb.db');
   callbackWithDb(db);
@@ -41,6 +43,21 @@ function insert_new_devise(devise, cb_with_err_and_lastId) {
     });
     pst.finalize();
   }); //end of withDbConnection()
+}
+
+function insertNewDevise(devise) {
+  return new Promise((resolve, reject) => {
+  withDbConnection(function (db) {
+    var pst = db.prepare("INSERT INTO devise (code, nom, change) VALUES(?,?,?)");
+    pst.run([devise.code, devise.nom, devise.change], function (err) {
+      if (err)
+          reject(err);
+        else
+          resolve(devise);//no auto_incr , no this.lastID on devise.code
+    });
+    pst.finalize();
+  }); //end of withDbConnection()
+});//end of Promise
 }
 
 function update_devise(devise, cb_with_err_and_nbChanges) {
@@ -116,10 +133,28 @@ function delete_devise_by_code(code, cb_with_err_and_nbChanges) {
   }); //end of withDbConnection()
 }
 
+function deleteDeviseByCode(code) {
+  return new Promise((resolve, reject) => {
+  withDbConnection(function (db) {
+    let sql = "DELETE FROM devise WHERE code=?";
+    db.run(sql, code, function (err) {
+      if (err)
+          reject(err);
+        else if (this.changes == 0)
+          reject(new NotFoundError("not devise found for delete with code=" + code));
+        else
+          resolve();
+    });
+  }); //end of withDbConnection()
+});
+}
+
 
 module.exports.init_devise_db = init_devise_db;
 module.exports.get_devises_by_WhereClause = get_devises_by_WhereClause;
 module.exports.get_devise_by_code = get_devise_by_code;
 module.exports.delete_devise_by_code = delete_devise_by_code;
 module.exports.insert_new_devise = insert_new_devise;
+module.exports.insertNewDevise = insertNewDevise;
 module.exports.update_devise = update_devise;
+module.exports.deleteDeviseByCode=deleteDeviseByCode;

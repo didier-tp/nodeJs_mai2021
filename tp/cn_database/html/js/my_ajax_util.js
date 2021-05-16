@@ -13,10 +13,18 @@ function registerCallbacks(xhr,callback,errCallback) {
 	};
 }
 
+function setAuthTokenInHttpHeaders(xhr) {
+	var authToken = sessionStorage.getItem("authToken");
+	console.log("setAuthTokenInHttpHeaders , authToken="+authToken); 
+	//localStorage.getItem("authToken");
+	xhr.setRequestHeader('Authorization',"Bearer "+ authToken);
+}
+
 function makeAjaxGetRequest(url,callback,errCallback) {
 	var xhr = new XMLHttpRequest();
 	registerCallbacks(xhr,callback,errCallback);
 	xhr.open("GET", url, true);
+	setAuthTokenInHttpHeaders(xhr);
 	xhr.send(null);
 }
 
@@ -24,6 +32,7 @@ function makeAjaxDeleteRequest(url,callback,errCallback) {
 	var xhr = new XMLHttpRequest();
 	registerCallbacks(xhr,callback,errCallback);
 	xhr.open("DELETE", url, true);
+	setAuthTokenInHttpHeaders(xhr);
 	xhr.send(null);
 }
 
@@ -32,6 +41,7 @@ function makeAjaxPostRequest(url,jsonData,callback,errCallback) {
 	registerCallbacks(xhr,callback,errCallback);
 	xhr.open("POST", url, true);
 	xhr.setRequestHeader("Content-Type", "application/json");
+	setAuthTokenInHttpHeaders(xhr);
 	xhr.send(jsonData);
 }
 
@@ -40,5 +50,6 @@ function makeAjaxPutRequest(url,jsonData,callback,errCallback) {
 	registerCallbacks(xhr,callback,errCallback);
 	xhr.open("PUT", url, true);
 	xhr.setRequestHeader("Content-Type", "application/json");
+	setAuthTokenInHttpHeaders(xhr);
 	xhr.send(jsonData);
 }

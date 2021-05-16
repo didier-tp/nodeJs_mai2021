@@ -26,3 +26,14 @@ https://pugjs.org/api/getting-started.html
  
 ========
 https://www.coursaline.com/tutoriels/developpement-web/creer-exemple-simple-popup
+
+===========
+intéressant (à néanmoins un peu adapter):
+  JWT avec passportjs :
+  https://www.digitalocean.com/community/tutorials/api-authentication-with-json-web-tokensjwt-and-passport
+
+  HTTPS avec nodeJs:
+  https://slproweb.com/products/Win32OpenSSL.html
+  https://blog.goovy.io/running-a-nodejs-server-with-https/
+
+  https://www.npmjs.com/package/node-windows (pour lancer nodeJs comme un service windows)

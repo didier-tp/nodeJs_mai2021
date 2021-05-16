@@ -1,0 +1,2 @@
+node reinit_login_sqlite_db.js
+pause

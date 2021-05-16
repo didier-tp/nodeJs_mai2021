@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="ISO-8859-1">
+	<title>login</title>
+	<script src="lib/jquery-3.4.0.min.js"></script>
+	<script src="js/my-jq-ajax-util.js"></script>
+	<script>
+	 $(function() {
+		 $('#btnLogin').on('click',function(){
+			 
+			 var auth = { username : null, password : null  , roles : null} ;
+			 auth.username = $('#txtUsername').val();
+			 auth.password = $('#txtPassword').val();
+			 auth.roles = $('#txtRoles').val();
+			 
+			 $.ajax({
+		           type: "POST",
+		           url: "../login-api/public/auth",
+		           dataType : "json",
+		           data : JSON.stringify(auth),
+		           contentType : "application/json",
+				   success: function (data,status,xhr) {
+		               if (data) {
+		            	   console.log(JSON.stringify(data));
+		            	   var authResponse = data;
+		            	   if(authResponse.status){
+		            		   $("#spanMsg").html(authResponse.message + " with roles=" + authResponse.roles);
+		            		   //localStorage.setItem("authToken",authResponse.token);
+		            		   sessionStorage.setItem("authToken",authResponse.token);
+		            	   }else{
+		            		   $("#spanMsg").html( authResponse.message);
+		            	   }
+		               } 
+		           },
+		           error: function( jqXHR, textStatus, errorThrown ){
+		        	   $("#spanMsg").html( xhrStatusToErrorMessage(jqXHR) + "status:" + textStatus + " error : " + errorThrown ) ;
+		           }
+				   });//end $.ajax
+			 
+		 });//end on click btnFindById
+	 }); 
+	
+	</script>
+</head>
+<body>
+   <h3> login (ws security) </h3>
+   <p>exemple of username : user1 , user2 , admin1 , admin2 </p>
+   <p>exemple of password : pwduser1 , pwdadmin2 , ...  </p>
+   username : <input id="txtUsername" type='text' value="admin1"/><br/>
+   password : <input id="txtPassword" type='text' value="pwdadmin1"/><br/>
+   roles : <input id="txtRoles" type='text' value="admin"/><br/>
+   <input type='button' value="login" id="btnLogin"/> <br/>
+   <span id="spanMsg"></span> <br/>
+	<hr/>
+	<a href="index.html">retour vers index.html</a>
+</body>
+</html>

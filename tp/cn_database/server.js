@@ -8,6 +8,7 @@ var produitApiRoutes = require('./produit-api-routes_memory');
 //var produitApiRoutes = require('./produit-api-routes_mongoose');
 //var bodyParser = require('body-parser');
 
+
 var apiErrorHandler = require('./apiHandler').apiErrorHandler;
 
 var loginApiRouter = require('./loginApiRoutes').loginApiRouter;
@@ -71,8 +72,21 @@ app.use(apiErrorHandler); //pour gérer les erreurs/exceptions
 
 const server = app.listen(8282 , function () {
   console.log("http://localhost:8282");
-  //ou bien process.env.PORT (avec set ENV=8282 dans .bat de lancement)  
+  //ou bien process.env.PORT (avec set PORT=8282 dans .bat de lancement)  
 });
+
+const https = require('https');
+const fs = require('fs');
+
+const options = {
+  key: fs.readFileSync('selfsigned.key'),
+  cert: fs.readFileSync('selfsigned.crt')
+};
+
+https.createServer(options, app).listen(8443,
+  function () {
+    console.log("https://localhost:8443");
+  });
 
 module.exports.app = app;
 module.exports.server = server;

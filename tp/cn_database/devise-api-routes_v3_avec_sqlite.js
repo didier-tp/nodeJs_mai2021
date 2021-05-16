@@ -24,7 +24,12 @@ apiRouter.route('/devise-api/public/conversion')
 		var source = req.query.source;
 		var cible = req.query.cible;
 		let deviseSource = await devise_dao_sqlite.get_devise_by_code(source);
-		let deviseCible = await devise_dao_sqlite.get_devise_by_code(cible);
+		let deviseCible = await devise_dao_sqlite.get_devise_by_code(cible); 
+		/*
+		const [ deviseSource , deviseCible ] = await Promise.all( [ 
+			devise_dao_sqlite.get_devise_by_code(source) ,
+            devise_dao_sqlite.get_devise_by_code(cible)
+			] );*/
 		let montantConverti = montant * deviseCible.change / deviseSource.change;
 		res.send({ montant , source , cible , montantConverti});
 	}catch(err){

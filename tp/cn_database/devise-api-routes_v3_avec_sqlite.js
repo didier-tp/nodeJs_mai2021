@@ -2,7 +2,7 @@ var express = require('express');
 const apiRouter = express.Router();
 
 var devise_dao_sqlite = require('./devise-dao-sqlite');
-
+var pre_traitements =  require("./pre-traitements");
 
 //exemple URL: http://localhost:8282/devise-api/public/devise/EUR
 apiRouter.route('/devise-api/public/devise/:code')
@@ -18,7 +18,10 @@ apiRouter.route('/devise-api/public/devise/:code')
 
 //exemple URL: http://localhost:8282/devise-api/public/conversion?montant=100&source=EUR&cible=USD
 apiRouter.route('/devise-api/public/conversion')
-.get( async function(req , res  , next ) {
+//.get( pre_traitements.displayHeaders , async function(req , res  , next ) {
+// si app.use(pre_traitements.displayHeaders) dans server.js
+// prétraitement déjà enregistré pour toutes les routes
+.get(  async function(req , res  , next ) {	
 	try{
 		var montant = Number(req.query.montant);
 		var source = req.query.source;

@@ -21,8 +21,8 @@ function asyncToResp(fn) {
       // Make sure to `.catch()` any errors and pass them along to the `next()`
       // middleware in the chain, in this case the error handler.
       fn(req, res, next)
-      .then((data)=> { res.send(data) })
-      .catch(next);
+      .then((data)=> { res.send(data) }) //avec par défaut le statut 200 OK.
+      .catch(next); //on déclenche un post-traitement (souvent enregistré dans server.js)
     };
   }
 

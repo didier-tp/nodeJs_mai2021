@@ -13,7 +13,7 @@ loginApiRouter.route('/login-api/private/role_admin/login')
     .get(asyncToResp(async function (req, res, next) {
         //let  critereXy = req.query.critereXy;
         let loginArray = await login_dao_sqlite.get_logins_by_WhereClause("");
-        return loginArray;
+        return loginArray; 
     }));
 
 //submitting authRequest (login) via post
@@ -67,7 +67,7 @@ loginApiRouter.route('/login-api/public/auth')
 
 //posting new user account:
 //POST ... with body { "username": "u1" , "password" : "pwdu1" , "roles" : "user" }
-loginApiRouter.route('/login-api/private/role_admin/login')
+loginApiRouter.route('/login-api/private/role-admin/login')
     .post(asyncToResp(async function (req, res, next) {
         let login = req.body; //as javascript object via jsonParser
         let savedLogin = await login_dao_sqlite.insert_new_login(login);
@@ -76,15 +76,15 @@ loginApiRouter.route('/login-api/private/role_admin/login')
 
 //updating existing user account:
 //PUT ... with body { "username": "u1" , "password" : "pwdU1" , "roles" : "user" }
-loginApiRouter.route('/login-api/private/role_admin/login')
+loginApiRouter.route('/login-api/private/role-admin/login')
     .put(asyncToResp(async function (req, res, next) {
         let login = req.body; //as javascript object
         let updatedLogin = await login_dao_sqlite.update_login(login);
         return updatedLogin;
     }));
 
-// DELETE http://localhost:8282/login-api/private/role_admin/login/user1
-loginApiRouter.route('/login-api/private/role_admin/login/:username')
+// DELETE http://localhost:8282/login-api/private/role-admin/login/user1
+loginApiRouter.route('/login-api/private/role-admin/login/:username')
     .delete(asyncToResp(async function (req, res, next) {
         let username = req.params.username;
         await login_dao_sqlite.delete_login_by_username(username)

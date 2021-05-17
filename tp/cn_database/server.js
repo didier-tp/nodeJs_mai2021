@@ -8,6 +8,8 @@ var produitApiRoutes = require('./produit-api-routes_memory');
 //var produitApiRoutes = require('./produit-api-routes_mongoose');
 //var bodyParser = require('body-parser');
 
+var pre_traitements =  require("./pre-traitements");
+var displayHeaders = pre_traitements.displayHeaders;
 
 var apiErrorHandler = require('./apiHandler').apiErrorHandler;
 
@@ -51,6 +53,11 @@ app.use(function(req, res, next) {
 //verif auth beared token in request for private api/path:
 app.use(verifTokenInHeadersForPrivatePath);
 
+
+
+app.use(displayHeaders); //enregistrement d'un pré-traitement
+                         // (pour toutes les routes)
+  
 
 //les routes en /html/... seront gérées par express par
 //de simples renvois des fichiers statiques

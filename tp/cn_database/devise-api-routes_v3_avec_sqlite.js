@@ -1,7 +1,9 @@
 var express = require('express');
 const apiRouter = express.Router();
 
-var devise_dao_sqlite = require('./devise-dao-sqlite');
+//var devise_dao_sqlite = require('./devise-dao-sqlite');
+var devise_dao_sqlite = require('./devise-dao-odbc');
+
 var pre_traitements =  require("./pre-traitements");
 
 //exemple URL: http://localhost:8282/devise-api/public/devise/EUR

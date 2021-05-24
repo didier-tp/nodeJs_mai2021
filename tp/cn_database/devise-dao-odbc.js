@@ -78,6 +78,16 @@ function executeStatement(sqlStatement , parameters , callback_with_err_and_coun
   });//end of withDbConnection 
 }//end of executeStatement
 
+function executeStatementPromise(sqlStatement , parameters){
+  return new Promise((resolve, reject) => {
+    executeStatement(sqlStatement , parameters,
+      (err,count)=> {
+        if(err) reject(err);
+        else resolve(count);
+      });
+  });
+}
+
 function executeQuery(sqlQuery,parameters,callback_with_err_or_resultArray){
   withDbConnection((cn , done)=>{
     cn.query(sqlQuery, parameters, (error, result) => {
@@ -94,123 +104,105 @@ function executeQuery(sqlQuery,parameters,callback_with_err_or_resultArray){
   })
 }
 
-function essai(){
-  
-//essai select elementaire:
-executeQuery('SELECT * FROM devise',[], (error, resultArray) => {
-    if (error) { console.error(error) }
-    console.log(resultArray);
-  });
-
-
- //essai select by primary key:
-  pk = "EUR";
-  executeQuery('SELECT * FROM devise WHERE code=?', [pk] ,
+function executeQueryPromise(sqlQuery,parameters){
+  return new Promise((resolve, reject) => {
+    executeQuery(sqlQuery,parameters,
       (error, resultArray) => {
-    if (error) { console.error(error) }
-    var devise = resultArray[0];
-    console.log(devise);
-  });
-
-
-//essai select by where clause:
-  changeMini = 1.0; 
-  executeQuery('SELECT * FROM devise WHERE change >= ?', [changeMini] ,
-      (error, resultArray) => {
-    if (error) { console.error(error) }
-    console.log(resultArray);
-  });
-
-
- //essai insert into:
-
- executeStatement('INSERT INTO devise (code, nom, change) VALUES(?,?,?)',
- [ 'M4' , "monnaie4" , 1.5] , (err,count)=> {
-   if(err) console.log("erreur="+JSON.stringify(err));
-   console.log("count="+count);
- }
- );
-
-}
-
-essai();
-
-/*
-function init_devise_db() {
-  withDbConnection(function (db) {
-    db.serialize(function () {
-
-      // Devise_ID INTEGER PRIMARY KEY  not used here (no autoincr)
-
-      db.run("CREATE TABLE if not exists devise (code VARCHAR(12) PRIMARY KEY, nom VARCHAR(64) NOT NULL , change DOUBLE)");
-
-      db.run("DELETE FROM devise");
-
-      var pst = db.prepare("INSERT INTO DEVISE(code,nom,change) VALUES (?,?,?)");
-      pst.run(["EUR", "Euro", 1.0]);
-      pst.run(["USD", "Dollar", 1.1]);
-      pst.run(["GBP", "Livre", 0.9]);
-      pst.run(["JPY", "Yen", 123.0]);
-      pst.finalize();
-
-      db.each("SELECT code,nom,change FROM devise", function (err, row) {
-        console.log(JSON.stringify(row));
+        if (error) { reject(error) }
+        else resolve(resultArray);
       });
-    });
-  }
-  ); //end of withDbConnection()
+  });
 }
+
+//************* fin de la partie generique ********/
+
+async function essai(){
+  try{
+      //essai select by where clause:
+      changeMini = 1.05; 
+      var resultArray =  await executeQueryPromise('SELECT * FROM devise WHERE change >= ?', [changeMini] );
+      console.log("init (change>1.05):" + JSON.stringify(resultArray));
+    
+    //essai insert into:
+
+    var nbInsert  = await executeStatementPromise('INSERT INTO devise (code, nom, change) VALUES(?,?,?)',
+    [ 'M1' , "monnaie1" , 1.5] );
+    console.log("nbInsert="+nbInsert);
+
+
+    // select by primary key (pour vérifier insert)
+    var pk = "M1";
+    var resArray = await executeQueryPromise('SELECT * FROM devise WHERE code=?', [pk] );
+    var insertedDevise = resArray[0];
+      console.log("insertedDevise="+ JSON.stringify(insertedDevise));
+
+    //essai update :
+
+    var nbUpdate  = await executeStatementPromise('UPDATE devise set nom=? , change=? WHERE code=?',
+    [  "monnaie1-bis" , 1.7 , 'M1'] );
+    console.log("nbUpdate="+nbUpdate);
+
+    // select by primary key (pour vérifier update)
+    pk = "M1";
+    resArray = await executeQueryPromise('SELECT * FROM devise WHERE code=?', [pk]);
+    var updatedDevise = resArray[0];
+    console.log("updatedDevise="+ JSON.stringify(updatedDevise));
+
+    //essai delete :
+
+    var nbDelete = await executeStatementPromise('DELETE FROM devise WHERE code=?', [ 'M1'] );
+    console.log("nbDelete="+nbDelete);
+
+    //select elementaire (pour vérifier delete):
+    resultArray = await executeQueryPromise('SELECT * FROM devise',[]);
+    console.log("apres delete: " +JSON.stringify(resultArray));
+  }
+  catch(error){
+    console.log(JSON.stringify(error))
+  }
+}
+
+
+
 
 
 
 function insert_new_devise(devise, cb_with_err_and_lastId) {
-  withDbConnection(function (cn) {
-    var pst = db.prepare("INSERT INTO devise (code, nom, change) VALUES(?,?,?)");
-    pst.run([devise.code, devise.nom, devise.change], function (err) {
-      cb_with_err_and_lastId(err, this.lastID)
-    });
-    pst.finalize();
-  }); //end of withDbConnection()
+  executeStatement('INSERT INTO devise (code, nom, change) VALUES(?,?,?)',
+  [devise.code, devise.nom, devise.change] , (err,count) =>{
+    cb_with_err_and_lastId(err, null);
+  });
 }
 
 function insertNewDevise(devise) {
   return new Promise((resolve, reject) => {
-  withDbConnection(function (db) {
-    var pst = db.prepare("INSERT INTO devise (code, nom, change) VALUES(?,?,?)");
-    pst.run([devise.code, devise.nom, devise.change], function (err) {
+  executeStatement('INSERT INTO devise (code, nom, change) VALUES(?,?,?)',
+    [devise.code, devise.nom, devise.change] , (err,count) =>{
       if (err)
           reject(err);
         else
-          resolve(devise);//no auto_incr , no this.lastID on devise.code
+          resolve(devise);//no auto_incr 
     });
-    pst.finalize();
-  }); //end of withDbConnection()
-});//end of Promise
+  });//end of Promise
 }
 
 function update_devise(devise, cb_with_err_and_nbChanges) {
-  withDbConnection(function (db) {
-    var pst = db.prepare("UPDATE devise SET nom=? , change=? WHERE code=?");
-    pst.run([devise.nom, devise.change, devise.code], function (err) {
-      cb_with_err_and_nbChanges(err, this.changes)
-    });
-    pst.finalize();
-  }); //end of withDbConnection()
+  executeStatement("UPDATE devise SET nom=? , change=? WHERE code=?" ,
+    [devise.nom, devise.change, devise.code], 
+      cb_with_err_and_nbChanges );
 }
 
 
 function get_devises_by_WhereClause(whereClause) {
   return new Promise((resolve, reject) => {
-    withDbConnection(function (db) {
-      let sql = "SELECT code,nom,change FROM devise " + whereClause;
-      db.all(sql, [], function (err, rows) {
+    executeQuery("SELECT code,nom,change FROM devise " + whereClause ,
+       [], function (err, rows) {
         //console.log(JSON.stringify(rows));
         if (err)
           reject(err);
         else
           resolve(rows);
       });
-    }); //end of withDbConnection()
   });//end of Promise
 }
 
@@ -218,48 +210,40 @@ function get_devises_by_WhereClause(whereClause) {
 
 function get_devise_by_code(code) {
   return new Promise((resolve, reject) => {
-    withDbConnection(function (db) {
-      let sql = "SELECT code,nom,change FROM devise WHERE code=?";
-      db.get(sql, code, function (err, row) {
-        //console.log(JSON.stringify(row));
+    executeQuery("SELECT code,nom,change FROM devise WHERE code=?",
+      [ code ], function (err, rows) {
+        //console.log(JSON.stringify(rows));
         if (err)
           reject(err);
-        else if (row == null)
+        else if (rows == null)
           reject("not found");
         else
-          resolve(row);
+          resolve(rows[0]);
       });
-    }); //end of withDbConnection()
   });
 }
 
 function delete_devise_by_code(code, cb_with_err_and_nbChanges) {
-  withDbConnection(function (db) {
-    let sql = "DELETE FROM devise WHERE code=?";
-    db.run(sql, code, function (err) {
-      cb_with_err_and_nbChanges(err, this.changes)
-    });
-  }); //end of withDbConnection()
+  executeStatement("DELETE FROM devise WHERE code=?",
+    [ code ],   cb_with_err_and_nbChanges);
 }
 
 function deleteDeviseByCode(code) {
   return new Promise((resolve, reject) => {
-  withDbConnection(function (db) {
-    let sql = "DELETE FROM devise WHERE code=?";
-    db.run(sql, code, function (err) {
+    executeStatement("DELETE FROM devise WHERE code=?",
+    [ code ],  function (err,count) {
       if (err)
           reject(err);
-        else if (this.changes == 0)
+        else if (count == 0)
           reject(new NotFoundError("not devise found for delete with code=" + code));
         else
           resolve();
-    });
-  }); //end of withDbConnection()
+    })
 });
 }
 
 
-module.exports.init_devise_db = init_devise_db;
+module.exports.essai = essai;
 module.exports.get_devises_by_WhereClause = get_devises_by_WhereClause;
 module.exports.get_devise_by_code = get_devise_by_code;
 module.exports.delete_devise_by_code = delete_devise_by_code;
@@ -267,5 +251,3 @@ module.exports.insert_new_devise = insert_new_devise;
 module.exports.insertNewDevise = insertNewDevise;
 module.exports.update_devise = update_devise;
 module.exports.deleteDeviseByCode=deleteDeviseByCode;
-
-*/

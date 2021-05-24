@@ -30,6 +30,7 @@
 		            		   sessionStorage.setItem("authToken",authResponse.token);
 		            	   }else{
 		            		   $("#spanMsg").html( authResponse.message);
+							   sessionStorage.setItem("authToken",null);
 		            	   }
 		               } 
 		           },

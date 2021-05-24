@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
+    "restart": "nodemon server.js",
     "test": "./node_modules/.bin/mocha test --reporter spec"
   },
   "author": "",
@@ -15,6 +16,7 @@
     "mongodb": "^3.6.5",
     "mongoose": "^5.12.5",
     "mongoose-auto-increment": "^5.0.1",
+    "odbc": "^2.3.6",
     "sqlite3": "^5.0.2"
   },
   "devDependencies": {
